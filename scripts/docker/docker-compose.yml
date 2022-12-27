@@ -2,11 +2,12 @@ version: "3.7"
 
 services:
   api:
+    container_name: victo-api
     build:
       context: ../..
       dockerfile: ./scripts/docker/Dockerfile
     volumes:
-      - ./src:/var/www/src
+      - ../..:/var/www/
     tty: true
     ports:
       - "3001:3001"
@@ -18,6 +19,7 @@ services:
       - victo_network
 
   db:
+    container_name: victo-db
     image: mysql:8.0
     command: >
       mysqld
