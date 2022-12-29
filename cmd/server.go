@@ -8,6 +8,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
+
 	"github.com/tmp-friends/victo-api/app/config"
 )
 
@@ -16,16 +18,15 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// TODO: .env
-
-	addr := config.LoadConfig().HTTPInfo.Addr
-
-	// TODO: DI container settings
-
-	// TODO: root settings
-	router := config.InitRouter()
+	// .env
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatal("Failed to load .env")
+	}
 
 	// Create app
+	addr := config.LoadConfig().HTTPInfo.Addr
+	router := config.InitRouter()
+
 	s := http.Server{
 		Addr:    addr,
 		Handler: router,
