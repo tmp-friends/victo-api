@@ -2,10 +2,8 @@ version: "3.7"
 
 services:
   api:
+    image: tmp-friends/victo-api:latest
     container_name: victo-api
-    build:
-      context: ../..
-      dockerfile: ./scripts/docker/Dockerfile
     volumes:
       - ../..:/var/www/
     tty: true
