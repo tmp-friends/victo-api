@@ -1,15 +1,14 @@
 package config
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"github.com/tmp-friends/victo-api/app/presentation/handler"
 )
 
 const (
-	apiVersion      = "/v1"
-	healthCheckRoot = "/health_check"
+	apiVersion = "/v1"
 )
 
 func InitRouter() *echo.Echo {
@@ -21,13 +20,10 @@ func InitRouter() *echo.Echo {
 	)
 
 	// health check
-	e.GET("/healthz", func(c echo.Context) error {
-		message := "OK"
-		return c.JSON(
-			http.StatusOK,
-			message,
-		)
-	})
+	healthzGroup := e.Group("/healthz")
+	{
+		healthzGroup.GET("", handler.Check())
+	}
 
 	return e
 }
