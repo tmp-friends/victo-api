@@ -4,4 +4,4 @@ RUN apk update && apk add git
 
 # TODO: root権限やめる
 
-WORKDIR /var/www/src
+WORKDIR /var/www
