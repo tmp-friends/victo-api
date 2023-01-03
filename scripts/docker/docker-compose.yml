@@ -9,16 +9,12 @@ services:
     tty: true
     ports:
       - "3001:3001"
-    environment:
-      MYSQL_HOST: mysql
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
     networks:
       - victo_network
 
   db:
-    container_name: victo-db
     image: mysql:8.0
+    container_name: victo-db
     command: >
       mysqld
       --character-set-server=utf8mb4
@@ -27,7 +23,9 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: victo
     ports:
       - "3306:3306"
     networks:
