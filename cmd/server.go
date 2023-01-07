@@ -27,7 +27,7 @@ func main() {
 	addr := config.LoadConfig().HTTPInfo.Addr
 	router := config.InitRouter()
 
-	s := http.Server{
+	s := &http.Server{
 		Addr:    addr,
 		Handler: router,
 	}
