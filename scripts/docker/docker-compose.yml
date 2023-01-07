@@ -12,28 +12,6 @@ services:
     networks:
       - victo_network
 
-  db:
-    image: mysql:8.0
-    container_name: victo-db
-    command: >
-      mysqld
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --skip-character-set-client-handshake
-    volumes:
-      - db_data:/var/lib/mysql
-    environment:
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: victo
-    ports:
-      - "3306:3306"
-    networks:
-      - victo_network
-
-volumes:
-  db_data:
-
 networks:
   victo_network:
     external: true
