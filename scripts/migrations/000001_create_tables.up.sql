@@ -1,0 +1,49 @@
+-- CreateTable
+CREATE TABLE `hashtags` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `tagName` VARCHAR(191) NOT NULL,
+    `isSelf` BOOLEAN NOT NULL DEFAULT true,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `vtubers` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `familyName` VARCHAR(191) NULL,
+    `givenName` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `hashtagId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `tweet_objects` (
+    `tweetId` VARCHAR(191) NOT NULL,
+    `text` VARCHAR(4096) NULL,
+    `retweetCount` INTEGER NOT NULL,
+    `likeCount` INTEGER NOT NULL,
+    `authorId` VARCHAR(191) NOT NULL,
+    `tweetUrl` VARCHAR(191) NOT NULL,
+    `tweetedAt` DATETIME(3) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `hashtagId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`tweetId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `media_objects` (
+    `type` VARCHAR(191) NOT NULL,
+    `url` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `tweetId` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`tweetId`, `url`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

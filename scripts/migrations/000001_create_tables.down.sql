@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS hashtags;
+
+DROP TABLE IF EXISTS vtubers;
+
+DROP TABLE IF EXISTS tweets;
+
+DROP TABLE IF EXISTS medias;
