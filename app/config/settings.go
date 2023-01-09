@@ -31,7 +31,7 @@ func LoadConfig() *appConfig {
 	// MySQLInfo
 	mysqlUser := os.Getenv("MYSQL_USER")
 	mysqlPassword := os.Getenv("MYSQL_PASSWORD")
-	mysqlAddr := os.Getenv("MYSQL_Addr")
+	mysqlAddr := os.Getenv("MYSQL_ADDR")
 	mysqlDBBame := os.Getenv("MYSQL_DBNAME")
 
 	mysqlInfo := &MySQLInfo{
