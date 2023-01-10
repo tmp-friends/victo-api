@@ -5,10 +5,11 @@ import (
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
 	"github.com/tmp-friends/victo-api/app/domain/repository"
+	"github.com/tmp-friends/victo-api/app/usecase/dto"
 )
 
 type IHashtagService interface {
-	FindHashtags(ctx context.Context) (models.HashtagSlice, error)
+	FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error)
 }
 
 type hashtagService struct {
@@ -21,6 +22,6 @@ func NewHashtagService(hr repository.IHashtagRepository) IHashtagService {
 	}
 }
 
-func (hs *hashtagService) FindHashtags(ctx context.Context) (models.HashtagSlice, error) {
-	return hs.repo.FindHashtags(ctx)
+func (hs *hashtagService) FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error) {
+	return hs.repo.FindHashtags(ctx, parameter)
 }
