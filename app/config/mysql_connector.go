@@ -1,20 +1,20 @@
-package infra
+package config
 
 import (
 	"database/sql"
 	"fmt"
 
-	"github.com/tmp-friends/victo-api/app/config"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const driverName = "mysql"
 
-type DBConnector struct {
+type MySQLConnector struct {
 	Conn *sql.DB
 }
 
-func NewDBConnector() *DBConnector {
-	conf := config.LoadConfig()
+func NewMySQLConnector() *MySQLConnector {
+	conf := LoadConfig()
 	dsn := createDSN(*conf.MySQLInfo)
 
 	conn, err := sql.Open(driverName, dsn)
@@ -22,13 +22,13 @@ func NewDBConnector() *DBConnector {
 		panic(err)
 	}
 
-	return &DBConnector{
+	return &MySQLConnector{
 		Conn: conn,
 	}
 }
 
-func createDSN(mysqlInfo config.MySQLInfo) string {
-	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s",
+func createDSN(mysqlInfo MySQLInfo) string {
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s?tls=true&parseTime=true",
 		mysqlInfo.User,
 		mysqlInfo.Password,
 		mysqlInfo.Addr,
