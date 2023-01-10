@@ -20,6 +20,7 @@ func InitRouter() *echo.Echo {
 	e.Use(
 		middleware.Logger(),
 		middleware.Recover(),
+		middleware.CORS(),
 	)
 
 	// health check
