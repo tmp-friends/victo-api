@@ -23,22 +23,34 @@ func InitRouter() *echo.Echo {
 		middleware.CORS(),
 	)
 
+	mysqlConnector := NewMySQLConnector()
+
 	// health check
 	healthzGroup := e.Group("/healthz")
 	{
 		healthzGroup.GET("", handler.Check())
 	}
 
-	mysqlConnector := NewMySQLConnector()
+	// hashtag
 	hashtagRepository := mysql.NewHashtagRepository(mysqlConnector.Conn)
 	hashtagService := service.NewHashtagService(hashtagRepository)
 	hashtagUsecase := usecase.NewHashtagUsecase(hashtagService)
 
-	// hashtag
-	hashtagGroup := e.Group("/hashtags")
+	hashtagsGroup := e.Group("/hashtags")
 	{
 		hashtagHandler := handler.NewHashtagHandler(hashtagUsecase)
-		hashtagGroup.GET("", hashtagHandler.FindHashtags())
+		hashtagsGroup.GET("", hashtagHandler.FindHashtags())
+	}
+
+	// tweet
+	tweetRepository := mysql.NewTweetRepository(mysqlConnector.Conn)
+	tweetService := service.NewTweetService(tweetRepository)
+	tweetUsecase := usecase.NewTweetUsecase(tweetService)
+
+	tweetGroup := e.Group("/tweet")
+	{
+		tweetHandler := handler.NewTweetHandler(tweetUsecase)
+		tweetGroup.GET("/:id", tweetHandler.FindTweet())
 	}
 
 	return e
