@@ -1,4 +1,4 @@
-package repository
+package query
 
 import (
 	"context"
@@ -7,6 +7,6 @@ import (
 	"github.com/tmp-friends/victo-api/app/usecase/dto"
 )
 
-type ITweetRepository interface {
+type ITweetQuery interface {
 	FindTweet(ctx context.Context, parameter dto.FindTweetParameter) (*models.TweetObject, error)
 }

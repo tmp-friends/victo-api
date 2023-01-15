@@ -4,7 +4,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/tmp-friends/victo-api/app/domain/service"
 	"github.com/tmp-friends/victo-api/app/infra/mysql"
 	"github.com/tmp-friends/victo-api/app/presentation/handler"
 	"github.com/tmp-friends/victo-api/app/usecase"
@@ -42,9 +41,8 @@ func InitRouter() *echo.Echo {
 	}
 
 	// tweet
-	tweetRepository := mysql.NewTweetRepository(mysqlConnector.Conn)
-	tweetService := service.NewTweetService(tweetRepository)
-	tweetUsecase := usecase.NewTweetUsecase(tweetService)
+	tweetQuery := mysql.NewTweetQuery(mysqlConnector.Conn)
+	tweetUsecase := usecase.NewTweetUsecase(tweetQuery)
 
 	tweetGroup := e.Group("/tweet")
 	{
