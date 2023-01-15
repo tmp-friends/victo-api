@@ -1,4 +1,4 @@
-package repository
+package query
 
 import (
 	"context"
@@ -7,6 +7,6 @@ import (
 	"github.com/tmp-friends/victo-api/app/usecase/dto"
 )
 
-type IHashtagRepository interface {
+type IHashtagQuery interface {
 	FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error)
 }

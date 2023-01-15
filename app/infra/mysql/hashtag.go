@@ -5,28 +5,28 @@ import (
 	"database/sql"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
-	"github.com/tmp-friends/victo-api/app/domain/repository"
 	"github.com/tmp-friends/victo-api/app/usecase/dto"
+	"github.com/tmp-friends/victo-api/app/usecase/query"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-type hashtagRepository struct {
+type hashtagQuery struct {
 	DB *sql.DB
 }
 
-func NewHashtagRepository(db *sql.DB) repository.IHashtagRepository {
-	return &hashtagRepository{
+func NewHashtagQuery(db *sql.DB) query.IHashtagQuery {
+	return &hashtagQuery{
 		DB: db,
 	}
 }
 
-func (hr *hashtagRepository) FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error) {
+func (hr *hashtagQuery) FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error) {
 	queries := hr.createQueries(parameter)
 
 	return models.Hashtags(queries...).All(ctx, hr.DB)
 }
 
-func (hr *hashtagRepository) createQueries(parameter dto.FindHashtagsParameter) []qm.QueryMod {
+func (hr *hashtagQuery) createQueries(parameter dto.FindHashtagsParameter) []qm.QueryMod {
 	queries := []qm.QueryMod{}
 
 	if parameter.Limit != 0 {

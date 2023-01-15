@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
-	"github.com/tmp-friends/victo-api/app/domain/service"
 	"github.com/tmp-friends/victo-api/app/usecase/dto"
+	"github.com/tmp-friends/victo-api/app/usecase/query"
 )
 
 type ITweetUsecase interface {
@@ -15,12 +15,12 @@ type ITweetUsecase interface {
 }
 
 type tweetUsecase struct {
-	service service.ITweetService
+	query query.ITweetQuery
 }
 
-func NewTweetUsecase(ts service.ITweetService) ITweetUsecase {
+func NewTweetUsecase(tq query.ITweetQuery) ITweetUsecase {
 	return &tweetUsecase{
-		service: ts,
+		query: tq,
 	}
 }
 
@@ -29,7 +29,7 @@ func (tu *tweetUsecase) CreateParameter(p string, qms url.Values) dto.FindTweetP
 }
 
 func (tu *tweetUsecase) FindTweet(ctx context.Context, parameter dto.FindTweetParameter) (*models.TweetObject, error) {
-	mto, err := tu.service.FindTweet(ctx, parameter)
+	mto, err := tu.query.FindTweet(ctx, parameter)
 	if err != nil {
 		return nil, err
 	}
