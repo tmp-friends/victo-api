@@ -32,9 +32,8 @@ func InitRouter() *echo.Echo {
 	}
 
 	// hashtag
-	hashtagRepository := mysql.NewHashtagRepository(mysqlConnector.Conn)
-	hashtagService := service.NewHashtagService(hashtagRepository)
-	hashtagUsecase := usecase.NewHashtagUsecase(hashtagService)
+	hashtagQuery := mysql.NewHashtagQuery(mysqlConnector.Conn)
+	hashtagUsecase := usecase.NewHashtagUsecase(hashtagQuery)
 
 	hashtagsGroup := e.Group("/hashtags")
 	{

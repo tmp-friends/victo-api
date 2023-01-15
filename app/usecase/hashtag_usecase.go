@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
-	"github.com/tmp-friends/victo-api/app/domain/service"
 	"github.com/tmp-friends/victo-api/app/usecase/dto"
+	"github.com/tmp-friends/victo-api/app/usecase/query"
 )
 
 type IHashtagUsecase interface {
@@ -15,12 +15,12 @@ type IHashtagUsecase interface {
 }
 
 type hashtagUsecase struct {
-	service service.IHashtagService
+	query query.IHashtagQuery
 }
 
-func NewHashtagUsecase(hs service.IHashtagService) IHashtagUsecase {
+func NewHashtagUsecase(hq query.IHashtagQuery) IHashtagUsecase {
 	return &hashtagUsecase{
-		service: hs,
+		query: hq,
 	}
 }
 
@@ -29,7 +29,7 @@ func (hu *hashtagUsecase) CreateParameter(qms url.Values) dto.FindHashtagsParame
 }
 
 func (hu *hashtagUsecase) FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error) {
-	mhSlice, err := hu.service.FindHashtags(ctx, parameter)
+	mhSlice, err := hu.query.FindHashtags(ctx, parameter)
 	if err != nil {
 		return nil, err
 	}
