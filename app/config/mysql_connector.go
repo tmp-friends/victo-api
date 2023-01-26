@@ -30,7 +30,7 @@ func NewMySQLConnector() *MySQLConnector {
 func createDSN(mysqlInfo MySQLInfo) string {
 	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s?tls=true&parseTime=true",
 		mysqlInfo.User,
-		mysqlInfo.Password,
+		mysqlInfo.Pass,
 		mysqlInfo.Addr,
 		mysqlInfo.DBName,
 	)

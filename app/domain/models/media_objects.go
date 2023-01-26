@@ -23,58 +23,58 @@ import (
 
 // MediaObject is an object representing the database table.
 type MediaObject struct {
-	Type      string    `boil:"type" json:"type" toml:"type" yaml:"type"`
+	MediaKey  string    `boil:"media_key" json:"media_key" toml:"media_key" yaml:"media_key"`
 	URL       string    `boil:"url" json:"url" toml:"url" yaml:"url"`
-	CreatedAt time.Time `boil:"createdAt" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time `boil:"updatedAt" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
-	TweetId   string    `boil:"tweetId" json:"tweetId" toml:"tweetId" yaml:"tweetId"`
+	Type      string    `boil:"type" json:"type" toml:"type" yaml:"type"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *mediaObjectR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L mediaObjectL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var MediaObjectColumns = struct {
-	Type      string
+	MediaKey  string
 	URL       string
+	Type      string
 	CreatedAt string
 	UpdatedAt string
-	TweetId   string
 }{
-	Type:      "type",
+	MediaKey:  "media_key",
 	URL:       "url",
-	CreatedAt: "createdAt",
-	UpdatedAt: "updatedAt",
-	TweetId:   "tweetId",
+	Type:      "type",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var MediaObjectTableColumns = struct {
-	Type      string
+	MediaKey  string
 	URL       string
+	Type      string
 	CreatedAt string
 	UpdatedAt string
-	TweetId   string
 }{
-	Type:      "media_objects.type",
+	MediaKey:  "media_objects.media_key",
 	URL:       "media_objects.url",
-	CreatedAt: "media_objects.createdAt",
-	UpdatedAt: "media_objects.updatedAt",
-	TweetId:   "media_objects.tweetId",
+	Type:      "media_objects.type",
+	CreatedAt: "media_objects.created_at",
+	UpdatedAt: "media_objects.updated_at",
 }
 
 // Generated where
 
 var MediaObjectWhere = struct {
-	Type      whereHelperstring
+	MediaKey  whereHelperstring
 	URL       whereHelperstring
+	Type      whereHelperstring
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
-	TweetId   whereHelperstring
 }{
-	Type:      whereHelperstring{field: "`media_objects`.`type`"},
+	MediaKey:  whereHelperstring{field: "`media_objects`.`media_key`"},
 	URL:       whereHelperstring{field: "`media_objects`.`url`"},
-	CreatedAt: whereHelpertime_Time{field: "`media_objects`.`createdAt`"},
-	UpdatedAt: whereHelpertime_Time{field: "`media_objects`.`updatedAt`"},
-	TweetId:   whereHelperstring{field: "`media_objects`.`tweetId`"},
+	Type:      whereHelperstring{field: "`media_objects`.`type`"},
+	CreatedAt: whereHelpertime_Time{field: "`media_objects`.`created_at`"},
+	UpdatedAt: whereHelpertime_Time{field: "`media_objects`.`updated_at`"},
 }
 
 // MediaObjectRels is where relationship names are stored.
@@ -94,10 +94,10 @@ func (*mediaObjectR) NewStruct() *mediaObjectR {
 type mediaObjectL struct{}
 
 var (
-	mediaObjectAllColumns            = []string{"type", "url", "createdAt", "updatedAt", "tweetId"}
-	mediaObjectColumnsWithoutDefault = []string{"type", "url", "tweetId"}
-	mediaObjectColumnsWithDefault    = []string{"createdAt", "updatedAt"}
-	mediaObjectPrimaryKeyColumns     = []string{"tweetId", "url"}
+	mediaObjectAllColumns            = []string{"media_key", "url", "type", "created_at", "updated_at"}
+	mediaObjectColumnsWithoutDefault = []string{"media_key", "url", "type"}
+	mediaObjectColumnsWithDefault    = []string{"created_at", "updated_at"}
+	mediaObjectPrimaryKeyColumns     = []string{"media_key"}
 	mediaObjectGeneratedColumns      = []string{}
 )
 
@@ -411,13 +411,13 @@ func MediaObjects(mods ...qm.QueryMod) mediaObjectQuery {
 }
 
 // FindMediaObjectG retrieves a single record by ID.
-func FindMediaObjectG(ctx context.Context, tweetId string, uRL string, selectCols ...string) (*MediaObject, error) {
-	return FindMediaObject(ctx, boil.GetContextDB(), tweetId, uRL, selectCols...)
+func FindMediaObjectG(ctx context.Context, mediaKey string, selectCols ...string) (*MediaObject, error) {
+	return FindMediaObject(ctx, boil.GetContextDB(), mediaKey, selectCols...)
 }
 
 // FindMediaObject retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindMediaObject(ctx context.Context, exec boil.ContextExecutor, tweetId string, uRL string, selectCols ...string) (*MediaObject, error) {
+func FindMediaObject(ctx context.Context, exec boil.ContextExecutor, mediaKey string, selectCols ...string) (*MediaObject, error) {
 	mediaObjectObj := &MediaObject{}
 
 	sel := "*"
@@ -425,10 +425,10 @@ func FindMediaObject(ctx context.Context, exec boil.ContextExecutor, tweetId str
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from `media_objects` where `tweetId`=? AND `url`=?", sel,
+		"select %s from `media_objects` where `media_key`=?", sel,
 	)
 
-	q := queries.Raw(query, tweetId, uRL)
+	q := queries.Raw(query, mediaKey)
 
 	err := q.Bind(ctx, exec, mediaObjectObj)
 	if err != nil {
@@ -458,6 +458,16 @@ func (o *MediaObject) Insert(ctx context.Context, exec boil.ContextExecutor, col
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -522,8 +532,7 @@ func (o *MediaObject) Insert(ctx context.Context, exec boil.ContextExecutor, col
 	}
 
 	identifierCols = []interface{}{
-		o.TweetId,
-		o.URL,
+		o.MediaKey,
 	}
 
 	if boil.IsDebug(ctx) {
@@ -556,6 +565,12 @@ func (o *MediaObject) UpdateG(ctx context.Context, columns boil.Columns) (int64,
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *MediaObject) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -695,13 +710,23 @@ func (o *MediaObject) UpsertG(ctx context.Context, updateColumns, insertColumns 
 	return o.Upsert(ctx, boil.GetContextDB(), updateColumns, insertColumns)
 }
 
-var mySQLMediaObjectUniqueColumns = []string{}
+var mySQLMediaObjectUniqueColumns = []string{
+	"media_key",
+}
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
 func (o *MediaObject) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no media_objects provided for upsert")
+	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
@@ -849,7 +874,7 @@ func (o *MediaObject) Delete(ctx context.Context, exec boil.ContextExecutor) (in
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), mediaObjectPrimaryKeyMapping)
-	sql := "DELETE FROM `media_objects` WHERE `tweetId`=? AND `url`=?"
+	sql := "DELETE FROM `media_objects` WHERE `media_key`=?"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -964,7 +989,7 @@ func (o *MediaObject) ReloadG(ctx context.Context) error {
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *MediaObject) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindMediaObject(ctx, exec, o.TweetId, o.URL)
+	ret, err := FindMediaObject(ctx, exec, o.MediaKey)
 	if err != nil {
 		return err
 	}
@@ -1013,21 +1038,21 @@ func (o *MediaObjectSlice) ReloadAll(ctx context.Context, exec boil.ContextExecu
 }
 
 // MediaObjectExistsG checks if the MediaObject row exists.
-func MediaObjectExistsG(ctx context.Context, tweetId string, uRL string) (bool, error) {
-	return MediaObjectExists(ctx, boil.GetContextDB(), tweetId, uRL)
+func MediaObjectExistsG(ctx context.Context, mediaKey string) (bool, error) {
+	return MediaObjectExists(ctx, boil.GetContextDB(), mediaKey)
 }
 
 // MediaObjectExists checks if the MediaObject row exists.
-func MediaObjectExists(ctx context.Context, exec boil.ContextExecutor, tweetId string, uRL string) (bool, error) {
+func MediaObjectExists(ctx context.Context, exec boil.ContextExecutor, mediaKey string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from `media_objects` where `tweetId`=? AND `url`=? limit 1)"
+	sql := "select exists(select 1 from `media_objects` where `media_key`=? limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, tweetId, uRL)
+		fmt.Fprintln(writer, mediaKey)
 	}
-	row := exec.QueryRowContext(ctx, sql, tweetId, uRL)
+	row := exec.QueryRowContext(ctx, sql, mediaKey)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1039,5 +1064,5 @@ func MediaObjectExists(ctx context.Context, exec boil.ContextExecutor, tweetId s
 
 // Exists checks if the MediaObject row exists.
 func (o *MediaObject) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return MediaObjectExists(ctx, exec, o.TweetId, o.URL)
+	return MediaObjectExists(ctx, exec, o.MediaKey)
 }
