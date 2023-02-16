@@ -44,10 +44,10 @@ func InitRouter() *echo.Echo {
 	tweetQuery := mysql.NewTweetQuery(mysqlConnector.Conn)
 	tweetUsecase := usecase.NewTweetUsecase(tweetQuery)
 
-	tweetGroup := e.Group("/tweet")
+	tweetsGroup := e.Group("/tweets")
 	{
 		tweetHandler := handler.NewTweetHandler(tweetUsecase)
-		tweetGroup.GET("/:id", tweetHandler.FindTweet())
+		tweetsGroup.GET("/:id", tweetHandler.FindTweet())
 	}
 
 	return e

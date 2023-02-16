@@ -34,7 +34,7 @@ func (tr *tweetQuery) createQueries(parameter dto.FindTweetParameter) []qm.Query
 		queries = append(queries, qm.Select(parameter.Props...))
 	}
 
-	queries = append(queries, qm.Where("tweetId=?", parameter.Id))
+	queries = append(queries, qm.Where("id=?", parameter.Id))
 
 	return queries
 }

@@ -24,65 +24,79 @@ import (
 
 // Vtuber is an object representing the database table.
 type Vtuber struct {
-	ID         int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	FamilyName null.String `boil:"familyName" json:"familyName,omitempty" toml:"familyName" yaml:"familyName,omitempty"`
-	GivenName  string      `boil:"givenName" json:"givenName" toml:"givenName" yaml:"givenName"`
-	CreatedAt  time.Time   `boil:"createdAt" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt  time.Time   `boil:"updatedAt" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
-	HashtagId  int         `boil:"hashtagId" json:"hashtagId" toml:"hashtagId" yaml:"hashtagId"`
+	ID              int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name            string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	BelongsTo       null.String `boil:"belongs_to" json:"belongs_to,omitempty" toml:"belongs_to" yaml:"belongs_to,omitempty"`
+	ProfileImageURL null.String `boil:"profile_image_url" json:"profile_image_url,omitempty" toml:"profile_image_url" yaml:"profile_image_url,omitempty"`
+	TwitterUserName null.String `boil:"twitter_user_name" json:"twitter_user_name,omitempty" toml:"twitter_user_name" yaml:"twitter_user_name,omitempty"`
+	Channel         null.String `boil:"channel" json:"channel,omitempty" toml:"channel" yaml:"channel,omitempty"`
+	CreatedAt       time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt       time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *vtuberR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L vtuberL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var VtuberColumns = struct {
-	ID         string
-	FamilyName string
-	GivenName  string
-	CreatedAt  string
-	UpdatedAt  string
-	HashtagId  string
+	ID              string
+	Name            string
+	BelongsTo       string
+	ProfileImageURL string
+	TwitterUserName string
+	Channel         string
+	CreatedAt       string
+	UpdatedAt       string
 }{
-	ID:         "id",
-	FamilyName: "familyName",
-	GivenName:  "givenName",
-	CreatedAt:  "createdAt",
-	UpdatedAt:  "updatedAt",
-	HashtagId:  "hashtagId",
+	ID:              "id",
+	Name:            "name",
+	BelongsTo:       "belongs_to",
+	ProfileImageURL: "profile_image_url",
+	TwitterUserName: "twitter_user_name",
+	Channel:         "channel",
+	CreatedAt:       "created_at",
+	UpdatedAt:       "updated_at",
 }
 
 var VtuberTableColumns = struct {
-	ID         string
-	FamilyName string
-	GivenName  string
-	CreatedAt  string
-	UpdatedAt  string
-	HashtagId  string
+	ID              string
+	Name            string
+	BelongsTo       string
+	ProfileImageURL string
+	TwitterUserName string
+	Channel         string
+	CreatedAt       string
+	UpdatedAt       string
 }{
-	ID:         "vtubers.id",
-	FamilyName: "vtubers.familyName",
-	GivenName:  "vtubers.givenName",
-	CreatedAt:  "vtubers.createdAt",
-	UpdatedAt:  "vtubers.updatedAt",
-	HashtagId:  "vtubers.hashtagId",
+	ID:              "vtubers.id",
+	Name:            "vtubers.name",
+	BelongsTo:       "vtubers.belongs_to",
+	ProfileImageURL: "vtubers.profile_image_url",
+	TwitterUserName: "vtubers.twitter_user_name",
+	Channel:         "vtubers.channel",
+	CreatedAt:       "vtubers.created_at",
+	UpdatedAt:       "vtubers.updated_at",
 }
 
 // Generated where
 
 var VtuberWhere = struct {
-	ID         whereHelperint
-	FamilyName whereHelpernull_String
-	GivenName  whereHelperstring
-	CreatedAt  whereHelpertime_Time
-	UpdatedAt  whereHelpertime_Time
-	HashtagId  whereHelperint
+	ID              whereHelperint
+	Name            whereHelperstring
+	BelongsTo       whereHelpernull_String
+	ProfileImageURL whereHelpernull_String
+	TwitterUserName whereHelpernull_String
+	Channel         whereHelpernull_String
+	CreatedAt       whereHelpertime_Time
+	UpdatedAt       whereHelpertime_Time
 }{
-	ID:         whereHelperint{field: "`vtubers`.`id`"},
-	FamilyName: whereHelpernull_String{field: "`vtubers`.`familyName`"},
-	GivenName:  whereHelperstring{field: "`vtubers`.`givenName`"},
-	CreatedAt:  whereHelpertime_Time{field: "`vtubers`.`createdAt`"},
-	UpdatedAt:  whereHelpertime_Time{field: "`vtubers`.`updatedAt`"},
-	HashtagId:  whereHelperint{field: "`vtubers`.`hashtagId`"},
+	ID:              whereHelperint{field: "`vtubers`.`id`"},
+	Name:            whereHelperstring{field: "`vtubers`.`name`"},
+	BelongsTo:       whereHelpernull_String{field: "`vtubers`.`belongs_to`"},
+	ProfileImageURL: whereHelpernull_String{field: "`vtubers`.`profile_image_url`"},
+	TwitterUserName: whereHelpernull_String{field: "`vtubers`.`twitter_user_name`"},
+	Channel:         whereHelpernull_String{field: "`vtubers`.`channel`"},
+	CreatedAt:       whereHelpertime_Time{field: "`vtubers`.`created_at`"},
+	UpdatedAt:       whereHelpertime_Time{field: "`vtubers`.`updated_at`"},
 }
 
 // VtuberRels is where relationship names are stored.
@@ -102,9 +116,9 @@ func (*vtuberR) NewStruct() *vtuberR {
 type vtuberL struct{}
 
 var (
-	vtuberAllColumns            = []string{"id", "familyName", "givenName", "createdAt", "updatedAt", "hashtagId"}
-	vtuberColumnsWithoutDefault = []string{"familyName", "givenName", "hashtagId"}
-	vtuberColumnsWithDefault    = []string{"id", "createdAt", "updatedAt"}
+	vtuberAllColumns            = []string{"id", "name", "belongs_to", "profile_image_url", "twitter_user_name", "channel", "created_at", "updated_at"}
+	vtuberColumnsWithoutDefault = []string{"id", "name", "belongs_to", "profile_image_url", "twitter_user_name", "channel"}
+	vtuberColumnsWithDefault    = []string{"created_at", "updated_at"}
 	vtuberPrimaryKeyColumns     = []string{"id"}
 	vtuberGeneratedColumns      = []string{}
 )
@@ -466,6 +480,16 @@ func (o *Vtuber) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -517,26 +541,15 @@ func (o *Vtuber) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to insert into vtubers")
 	}
 
-	var lastID int64
 	var identifierCols []interface{}
 
 	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == vtuberMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -574,6 +587,12 @@ func (o *Vtuber) UpdateG(ctx context.Context, columns boil.Columns) (int64, erro
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Vtuber) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -723,6 +742,14 @@ func (o *Vtuber) Upsert(ctx context.Context, exec boil.ContextExecutor, updateCo
 	if o == nil {
 		return errors.New("models: no vtubers provided for upsert")
 	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
+	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
@@ -812,27 +839,16 @@ func (o *Vtuber) Upsert(ctx context.Context, exec boil.ContextExecutor, updateCo
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert for vtubers")
 	}
 
-	var lastID int64
 	var uniqueMap []uint64
 	var nzUniqueCols []interface{}
 
 	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == vtuberMapping["id"] {
 		goto CacheNoHooks
 	}
 

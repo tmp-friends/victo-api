@@ -24,10 +24,11 @@ import (
 // Hashtag is an object representing the database table.
 type Hashtag struct {
 	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	TagName   string    `boil:"tagName" json:"tagName" toml:"tagName" yaml:"tagName"`
-	IsSelf    bool      `boil:"isSelf" json:"isSelf" toml:"isSelf" yaml:"isSelf"`
-	CreatedAt time.Time `boil:"createdAt" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time `boil:"updatedAt" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	Name      string    `boil:"name" json:"name" toml:"name" yaml:"name"`
+	IsSelf    bool      `boil:"is_self" json:"is_self" toml:"is_self" yaml:"is_self"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	VtuberID  int       `boil:"vtuber_id" json:"vtuber_id" toml:"vtuber_id" yaml:"vtuber_id"`
 
 	R *hashtagR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L hashtagL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -35,30 +36,34 @@ type Hashtag struct {
 
 var HashtagColumns = struct {
 	ID        string
-	TagName   string
+	Name      string
 	IsSelf    string
 	CreatedAt string
 	UpdatedAt string
+	VtuberID  string
 }{
 	ID:        "id",
-	TagName:   "tagName",
-	IsSelf:    "isSelf",
-	CreatedAt: "createdAt",
-	UpdatedAt: "updatedAt",
+	Name:      "name",
+	IsSelf:    "is_self",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
+	VtuberID:  "vtuber_id",
 }
 
 var HashtagTableColumns = struct {
 	ID        string
-	TagName   string
+	Name      string
 	IsSelf    string
 	CreatedAt string
 	UpdatedAt string
+	VtuberID  string
 }{
 	ID:        "hashtags.id",
-	TagName:   "hashtags.tagName",
-	IsSelf:    "hashtags.isSelf",
-	CreatedAt: "hashtags.createdAt",
-	UpdatedAt: "hashtags.updatedAt",
+	Name:      "hashtags.name",
+	IsSelf:    "hashtags.is_self",
+	CreatedAt: "hashtags.created_at",
+	UpdatedAt: "hashtags.updated_at",
+	VtuberID:  "hashtags.vtuber_id",
 }
 
 // Generated where
@@ -141,16 +146,18 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 
 var HashtagWhere = struct {
 	ID        whereHelperint
-	TagName   whereHelperstring
+	Name      whereHelperstring
 	IsSelf    whereHelperbool
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
+	VtuberID  whereHelperint
 }{
 	ID:        whereHelperint{field: "`hashtags`.`id`"},
-	TagName:   whereHelperstring{field: "`hashtags`.`tagName`"},
-	IsSelf:    whereHelperbool{field: "`hashtags`.`isSelf`"},
-	CreatedAt: whereHelpertime_Time{field: "`hashtags`.`createdAt`"},
-	UpdatedAt: whereHelpertime_Time{field: "`hashtags`.`updatedAt`"},
+	Name:      whereHelperstring{field: "`hashtags`.`name`"},
+	IsSelf:    whereHelperbool{field: "`hashtags`.`is_self`"},
+	CreatedAt: whereHelpertime_Time{field: "`hashtags`.`created_at`"},
+	UpdatedAt: whereHelpertime_Time{field: "`hashtags`.`updated_at`"},
+	VtuberID:  whereHelperint{field: "`hashtags`.`vtuber_id`"},
 }
 
 // HashtagRels is where relationship names are stored.
@@ -170,9 +177,9 @@ func (*hashtagR) NewStruct() *hashtagR {
 type hashtagL struct{}
 
 var (
-	hashtagAllColumns            = []string{"id", "tagName", "isSelf", "createdAt", "updatedAt"}
-	hashtagColumnsWithoutDefault = []string{"tagName"}
-	hashtagColumnsWithDefault    = []string{"id", "isSelf", "createdAt", "updatedAt"}
+	hashtagAllColumns            = []string{"id", "name", "is_self", "created_at", "updated_at", "vtuber_id"}
+	hashtagColumnsWithoutDefault = []string{"id", "name", "vtuber_id"}
+	hashtagColumnsWithDefault    = []string{"is_self", "created_at", "updated_at"}
 	hashtagPrimaryKeyColumns     = []string{"id"}
 	hashtagGeneratedColumns      = []string{}
 )
@@ -534,6 +541,16 @@ func (o *Hashtag) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -585,26 +602,15 @@ func (o *Hashtag) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to insert into hashtags")
 	}
 
-	var lastID int64
 	var identifierCols []interface{}
 
 	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == hashtagMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -642,6 +648,12 @@ func (o *Hashtag) UpdateG(ctx context.Context, columns boil.Columns) (int64, err
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Hashtag) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -791,6 +803,14 @@ func (o *Hashtag) Upsert(ctx context.Context, exec boil.ContextExecutor, updateC
 	if o == nil {
 		return errors.New("models: no hashtags provided for upsert")
 	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
+	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
@@ -880,27 +900,16 @@ func (o *Hashtag) Upsert(ctx context.Context, exec boil.ContextExecutor, updateC
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert for hashtags")
 	}
 
-	var lastID int64
 	var uniqueMap []uint64
 	var nzUniqueCols []interface{}
 
 	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == hashtagMapping["id"] {
 		goto CacheNoHooks
 	}
 
