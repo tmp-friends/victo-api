@@ -27,6 +27,7 @@ func (tr *tweetQuery) FindTweet(
 	queries := []qm.QueryMod{}
 
 	queries = append(queries, qm.Where("id=?", id))
+
 	if props != nil {
 		queries = append(queries, qm.Select(props...))
 	}
@@ -40,7 +41,7 @@ func (tr *tweetQuery) FindTweetsByHashtagId(
 	limit int,
 	offset int,
 	props []string,
-) ([]*models.TweetObject, error) {
+) (models.TweetObjectSlice, error) {
 	queries := []qm.QueryMod{}
 
 	queries = append(queries, qm.Where("hashtag_id=?", hashtagId))
@@ -48,11 +49,9 @@ func (tr *tweetQuery) FindTweetsByHashtagId(
 	if limit != 0 {
 		queries = append(queries, qm.Limit(limit))
 	}
-
 	if offset != 0 {
 		queries = append(queries, qm.Offset(offset))
 	}
-
 	if props != nil {
 		queries = append(queries, qm.Select(props...))
 	}

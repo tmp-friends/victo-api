@@ -20,7 +20,7 @@ type ITweetUsecase interface {
 		ctx context.Context,
 		parameter string,
 		qms url.Values,
-	) ([]*models.TweetObject, error)
+	) (models.TweetObjectSlice, error)
 }
 
 type tweetUsecase struct {
@@ -45,19 +45,19 @@ func (tu *tweetUsecase) FindTweet(
 
 	props := qms["props"]
 
-	mto, err := tu.query.FindTweet(ctx, id, props)
+	to, err := tu.query.FindTweet(ctx, id, props)
 	if err != nil {
 		return nil, err
 	}
 
-	return mto, nil
+	return to, nil
 }
 
 func (tu *tweetUsecase) FindTweetsByHashtagId(
 	ctx context.Context,
 	parameter string,
 	qms url.Values,
-) ([]*models.TweetObject, error) {
+) (models.TweetObjectSlice, error) {
 	hashtagId := parameter
 
 	var limit int
@@ -80,7 +80,7 @@ func (tu *tweetUsecase) FindTweetsByHashtagId(
 
 	props := qms["props"]
 
-	mto, err := tu.query.FindTweetsByHashtagId(
+	tos, err := tu.query.FindTweetsByHashtagId(
 		ctx,
 		hashtagId,
 		limit,
@@ -91,5 +91,5 @@ func (tu *tweetUsecase) FindTweetsByHashtagId(
 		return nil, err
 	}
 
-	return mto, nil
+	return tos, nil
 }

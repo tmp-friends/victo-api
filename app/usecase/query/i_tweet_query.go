@@ -19,5 +19,5 @@ type ITweetQuery interface {
 		limit int,
 		offset int,
 		props []string,
-	) ([]*models.TweetObject, error)
+	) (models.TweetObjectSlice, error)
 }
