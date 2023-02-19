@@ -48,6 +48,7 @@ func InitRouter() *echo.Echo {
 	{
 		tweetHandler := handler.NewTweetHandler(tweetUsecase)
 		tweetsGroup.GET("/:id", tweetHandler.FindTweet())
+		tweetsGroup.GET("/hashtag/:id", tweetHandler.FindTweetsByHashtagId())
 	}
 
 	return e

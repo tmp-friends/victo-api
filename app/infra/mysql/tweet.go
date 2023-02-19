@@ -21,7 +21,10 @@ func NewTweetQuery(db *sql.DB) query.ITweetQuery {
 }
 
 // TODO: createQueries()はエンドポイント毎に異なるので、ファイルを分離するか検討
-func (tr *tweetQuery) FindTweet(ctx context.Context, parameter dto.FindTweetParameter) (*models.TweetObject, error) {
+func (tr *tweetQuery) FindTweet(
+	ctx context.Context,
+	parameter dto.FindTweetParameter,
+) (*models.TweetObject, error) {
 	queries := tr.createQueries(parameter)
 
 	return models.TweetObjects(queries...).One(ctx, tr.DB)
@@ -37,4 +40,30 @@ func (tr *tweetQuery) createQueries(parameter dto.FindTweetParameter) []qm.Query
 	queries = append(queries, qm.Where("id=?", parameter.Id))
 
 	return queries
+}
+
+func (tr *tweetQuery) FindTweetsByHashtagId(
+	ctx context.Context,
+	hashtagId string,
+	limit int,
+	offset int,
+	props []string,
+) ([]*models.TweetObject, error) {
+	queries := []qm.QueryMod{}
+
+	queries = append(queries, qm.Where("hashtag_id=?", hashtagId))
+
+	if limit != 0 {
+		queries = append(queries, qm.Limit(limit))
+	}
+
+	if offset != 0 {
+		queries = append(queries, qm.Offset(offset))
+	}
+
+	if props != nil {
+		queries = append(queries, qm.Select(props...))
+	}
+
+	return models.TweetObjects(queries...).All(ctx, tr.DB)
 }

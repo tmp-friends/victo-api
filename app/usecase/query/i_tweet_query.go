@@ -9,4 +9,12 @@ import (
 
 type ITweetQuery interface {
 	FindTweet(ctx context.Context, parameter dto.FindTweetParameter) (*models.TweetObject, error)
+
+	FindTweetsByHashtagId(
+		ctx context.Context,
+		hashtagId string,
+		limit int,
+		offset int,
+		props []string,
+	) ([]*models.TweetObject, error)
 }
