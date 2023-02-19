@@ -20,12 +20,10 @@ func NewTweetHandler(tu usecase.ITweetUsecase) *tweetHandler {
 func (th *tweetHandler) FindTweet() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
-
 		p := c.Param("id")
 		qms := c.QueryParams()
-		parameter := th.usecase.CreateParameter(p, qms)
 
-		tweet, err := th.usecase.FindTweet(ctx, parameter)
+		tweet, err := th.usecase.FindTweet(ctx, p, qms)
 
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())
@@ -38,7 +36,6 @@ func (th *tweetHandler) FindTweet() echo.HandlerFunc {
 func (th *tweetHandler) FindTweetsByHashtagId() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
-
 		p := c.Param("id")
 		qms := c.QueryParams()
 
