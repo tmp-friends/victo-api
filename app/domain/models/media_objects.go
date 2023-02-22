@@ -28,6 +28,7 @@ type MediaObject struct {
 	Type      string    `boil:"type" json:"type" toml:"type" yaml:"type"`
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	TweetID   string    `boil:"tweet_id" json:"tweet_id" toml:"tweet_id" yaml:"tweet_id"`
 
 	R *mediaObjectR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L mediaObjectL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -39,12 +40,14 @@ var MediaObjectColumns = struct {
 	Type      string
 	CreatedAt string
 	UpdatedAt string
+	TweetID   string
 }{
 	MediaKey:  "media_key",
 	URL:       "url",
 	Type:      "type",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
+	TweetID:   "tweet_id",
 }
 
 var MediaObjectTableColumns = struct {
@@ -53,12 +56,14 @@ var MediaObjectTableColumns = struct {
 	Type      string
 	CreatedAt string
 	UpdatedAt string
+	TweetID   string
 }{
 	MediaKey:  "media_objects.media_key",
 	URL:       "media_objects.url",
 	Type:      "media_objects.type",
 	CreatedAt: "media_objects.created_at",
 	UpdatedAt: "media_objects.updated_at",
+	TweetID:   "media_objects.tweet_id",
 }
 
 // Generated where
@@ -69,12 +74,14 @@ var MediaObjectWhere = struct {
 	Type      whereHelperstring
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
+	TweetID   whereHelperstring
 }{
 	MediaKey:  whereHelperstring{field: "`media_objects`.`media_key`"},
 	URL:       whereHelperstring{field: "`media_objects`.`url`"},
 	Type:      whereHelperstring{field: "`media_objects`.`type`"},
 	CreatedAt: whereHelpertime_Time{field: "`media_objects`.`created_at`"},
 	UpdatedAt: whereHelpertime_Time{field: "`media_objects`.`updated_at`"},
+	TweetID:   whereHelperstring{field: "`media_objects`.`tweet_id`"},
 }
 
 // MediaObjectRels is where relationship names are stored.
@@ -94,8 +101,8 @@ func (*mediaObjectR) NewStruct() *mediaObjectR {
 type mediaObjectL struct{}
 
 var (
-	mediaObjectAllColumns            = []string{"media_key", "url", "type", "created_at", "updated_at"}
-	mediaObjectColumnsWithoutDefault = []string{"media_key", "url", "type"}
+	mediaObjectAllColumns            = []string{"media_key", "url", "type", "created_at", "updated_at", "tweet_id"}
+	mediaObjectColumnsWithoutDefault = []string{"media_key", "url", "type", "tweet_id"}
 	mediaObjectColumnsWithDefault    = []string{"created_at", "updated_at"}
 	mediaObjectPrimaryKeyColumns     = []string{"media_key"}
 	mediaObjectGeneratedColumns      = []string{}

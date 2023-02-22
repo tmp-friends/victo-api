@@ -29,8 +29,7 @@ CREATE TABLE `tweet_objects` (
     `retweet_count` INTEGER NOT NULL,
     `like_count` INTEGER NOT NULL,
     `author_id` VARCHAR(191) NOT NULL,
-    `tweet_url` VARCHAR(191) NOT NULL,
-    `media_key` VARCHAR(191) NOT NULL,
+    `url` VARCHAR(191) NOT NULL,
     `tweeted_at` DATETIME(3) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -45,6 +44,7 @@ CREATE TABLE `media_objects` (
     `type` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `tweet_id` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`media_key`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
