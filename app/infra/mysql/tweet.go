@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
-	"github.com/tmp-friends/victo-api/app/usecase/dto"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -20,21 +19,42 @@ func NewTweetQuery(db *sql.DB) query.ITweetQuery {
 	}
 }
 
-// TODO: createQueries()はエンドポイント毎に異なるので、ファイルを分離するか検討
-func (tr *tweetQuery) FindTweet(ctx context.Context, parameter dto.FindTweetParameter) (*models.TweetObject, error) {
-	queries := tr.createQueries(parameter)
+func (tr *tweetQuery) FindTweet(
+	ctx context.Context,
+	id int,
+	props []string,
+) (*models.TweetObject, error) {
+	queries := []qm.QueryMod{}
+
+	queries = append(queries, qm.Where("id=?", id))
+
+	if props != nil {
+		queries = append(queries, qm.Select(props...))
+	}
 
 	return models.TweetObjects(queries...).One(ctx, tr.DB)
 }
 
-func (tr *tweetQuery) createQueries(parameter dto.FindTweetParameter) []qm.QueryMod {
+func (tr *tweetQuery) FindTweetsByHashtagId(
+	ctx context.Context,
+	hashtagId string,
+	limit int,
+	offset int,
+	props []string,
+) (models.TweetObjectSlice, error) {
 	queries := []qm.QueryMod{}
 
-	if parameter.Props != nil {
-		queries = append(queries, qm.Select(parameter.Props...))
+	queries = append(queries, qm.Where("hashtag_id=?", hashtagId))
+
+	if limit != 0 {
+		queries = append(queries, qm.Limit(limit))
+	}
+	if offset != 0 {
+		queries = append(queries, qm.Offset(offset))
+	}
+	if props != nil {
+		queries = append(queries, qm.Select(props...))
 	}
 
-	queries = append(queries, qm.Where("id=?", parameter.Id))
-
-	return queries
+	return models.TweetObjects(queries...).All(ctx, tr.DB)
 }

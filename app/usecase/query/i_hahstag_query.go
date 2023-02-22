@@ -4,9 +4,13 @@ import (
 	"context"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
-	"github.com/tmp-friends/victo-api/app/usecase/dto"
 )
 
 type IHashtagQuery interface {
-	FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error)
+	FindHashtags(
+		ctx context.Context,
+		limit int,
+		offset int,
+		props []string,
+	) (models.HashtagSlice, error)
 }

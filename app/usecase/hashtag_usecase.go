@@ -3,15 +3,14 @@ package usecase
 import (
 	"context"
 	"net/url"
+	"strconv"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
-	"github.com/tmp-friends/victo-api/app/usecase/dto"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
 )
 
 type IHashtagUsecase interface {
-	CreateParameter(qms url.Values) dto.FindHashtagsParameter
-	FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error)
+	FindHashtags(ctx context.Context, qms url.Values) (models.HashtagSlice, error)
 }
 
 type hashtagUsecase struct {
@@ -24,15 +23,34 @@ func NewHashtagUsecase(hq query.IHashtagQuery) IHashtagUsecase {
 	}
 }
 
-func (hu *hashtagUsecase) CreateParameter(qms url.Values) dto.FindHashtagsParameter {
-	return dto.Create(qms)
-}
+func (hu *hashtagUsecase) FindHashtags(
+	ctx context.Context,
+	qms url.Values,
+) (models.HashtagSlice, error) {
+	var limit int
+	if qms["limit"] != nil {
+		l, err := strconv.Atoi(qms["limit"][0])
+		if err != nil {
+			panic(err)
+		}
+		limit = l
+	}
 
-func (hu *hashtagUsecase) FindHashtags(ctx context.Context, parameter dto.FindHashtagsParameter) (models.HashtagSlice, error) {
-	mhSlice, err := hu.query.FindHashtags(ctx, parameter)
+	var offset int
+	if qms["offset"] != nil {
+		o, err := strconv.Atoi(qms["offset"][0])
+		if err != nil {
+			panic(err)
+		}
+		offset = o
+	}
+
+	props := qms["props"]
+
+	hs, err := hu.query.FindHashtags(ctx, limit, offset, props)
 	if err != nil {
 		return nil, err
 	}
 
-	return mhSlice, nil
+	return hs, nil
 }
