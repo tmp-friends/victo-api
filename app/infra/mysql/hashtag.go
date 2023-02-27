@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
+	"github.com/tmp-friends/victo-api/app/usecase/dto"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -24,7 +25,10 @@ func (hr *hashtagQuery) FindHashtags(
 	limit int,
 	offset int,
 	props []string,
-) (models.HashtagSlice, error) {
+	withVtuber bool,
+) ([]dto.Hashtag, error) {
+	var hashtags []dto.Hashtag
+
 	queries := []qm.QueryMod{}
 
 	if limit != 0 {
@@ -33,9 +37,25 @@ func (hr *hashtagQuery) FindHashtags(
 	if offset != 0 {
 		queries = append(queries, qm.Offset(offset))
 	}
-	if props != nil {
-		queries = append(queries, qm.Select(props...))
+	switch withVtuber {
+	case true:
+		queries = append(queries, qm.LeftOuterJoin("vtubers as v on v.ID = hashtags.vtuber_id"))
+		// TODO: props指定
+		queries = append(queries, qm.Select(
+			"hashtags.*",
+			"v.name as vtuber_name",
+			"v.belongs_to as belongs_to",
+			"v.profile_image_url as profile_image_url",
+			"v.twitter_user_name as twitter_user_name",
+			"v.channel as channel",
+		))
+	default:
+		if props != nil {
+			queries = append(queries, qm.Select(props...))
+		}
 	}
 
-	return models.Hashtags(queries...).All(ctx, hr.DB)
+	err := models.Hashtags(queries...).Bind(ctx, hr.DB, &hashtags)
+
+	return hashtags, err
 }
