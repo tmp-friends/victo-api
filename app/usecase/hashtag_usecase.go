@@ -32,7 +32,7 @@ func (hu *hashtagUsecase) FindHashtags(
 	if qms["limit"] != nil {
 		l, err := strconv.Atoi(qms["limit"][0])
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		limit = l
 	}
@@ -41,7 +41,7 @@ func (hu *hashtagUsecase) FindHashtags(
 	if qms["offset"] != nil {
 		o, err := strconv.Atoi(qms["offset"][0])
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		offset = o
 	}
@@ -57,7 +57,7 @@ func (hu *hashtagUsecase) FindHashtags(
 
 	hs, err := hu.query.FindHashtags(ctx, limit, offset, props, withVtuber)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return hs, nil

@@ -40,7 +40,7 @@ func (tu *tweetUsecase) FindTweet(
 ) (*models.TweetObject, error) {
 	id, err := strconv.Atoi(parameter)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	props := qms["props"]
@@ -64,7 +64,7 @@ func (tu *tweetUsecase) FindTweetsByHashtagId(
 	if qms["limit"] != nil {
 		l, err := strconv.Atoi(qms["limit"][0])
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		limit = l
 	}
@@ -73,7 +73,7 @@ func (tu *tweetUsecase) FindTweetsByHashtagId(
 	if qms["offset"] != nil {
 		o, err := strconv.Atoi(qms["offset"][0])
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		offset = o
 	}
