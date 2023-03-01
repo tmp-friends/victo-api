@@ -55,6 +55,9 @@ func (tr *tweetQuery) FindTweetsByHashtagId(
 	if props != nil {
 		queries = append(queries, qm.Select(props...))
 	}
+	// TODO: sort
+	// Enumで指定できるようにする
+	queries = append(queries, qm.OrderBy("tweeted_at desc"))
 
 	return models.TweetObjects(queries...).All(ctx, tr.DB)
 }
