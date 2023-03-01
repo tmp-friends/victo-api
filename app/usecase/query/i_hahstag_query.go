@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 
-	"github.com/tmp-friends/victo-api/app/domain/models"
+	"github.com/tmp-friends/victo-api/app/usecase/dto"
 )
 
 type IHashtagQuery interface {
@@ -12,5 +12,6 @@ type IHashtagQuery interface {
 		limit int,
 		offset int,
 		props []string,
-	) (models.HashtagSlice, error)
+		withVtuber bool,
+	) ([]dto.Hashtag, error)
 }
