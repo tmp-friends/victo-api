@@ -10,6 +10,12 @@ import (
 )
 
 type IHashtagUsecase interface {
+	FindHashtag(
+		ctx context.Context,
+		parameter string,
+		qms url.Values,
+	) (dto.Hashtag, error)
+
 	FindHashtags(ctx context.Context, qms url.Values) ([]dto.Hashtag, error)
 }
 
@@ -21,6 +27,33 @@ func NewHashtagUsecase(hq query.IHashtagQuery) IHashtagUsecase {
 	return &hashtagUsecase{
 		query: hq,
 	}
+}
+
+func (hu *hashtagUsecase) FindHashtag(
+	ctx context.Context,
+	parameter string,
+	qms url.Values,
+) (dto.Hashtag, error) {
+	id, err := strconv.Atoi(parameter)
+	if err != nil {
+		return dto.Hashtag{}, err
+	}
+
+	props := qms["props"]
+
+	var withVtuber bool
+	if qms["withVtuber"] != nil {
+		if qms["withVtuber"][0] == "true" {
+			withVtuber = true
+		}
+	}
+
+	h, err := hu.query.FindHashtag(ctx, id, props, withVtuber)
+	if err != nil {
+		return dto.Hashtag{}, err
+	}
+
+	return h, nil
 }
 
 func (hu *hashtagUsecase) FindHashtags(

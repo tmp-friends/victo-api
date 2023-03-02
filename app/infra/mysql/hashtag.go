@@ -20,6 +20,41 @@ func NewHashtagQuery(db *sql.DB) query.IHashtagQuery {
 	}
 }
 
+func (hr *hashtagQuery) FindHashtag(
+	ctx context.Context,
+	id int,
+	props []string,
+	withVtuber bool,
+) (dto.Hashtag, error) {
+	var hashtag dto.Hashtag
+
+	queries := []qm.QueryMod{}
+
+	queries = append(queries, qm.Where("hashtags.id=?", id))
+
+	switch withVtuber {
+	case true:
+		queries = append(queries, qm.LeftOuterJoin("vtubers as v on v.id = hashtags.vtuber_id"))
+		// TODO: props指定
+		queries = append(queries, qm.Select(
+			"hashtags.*",
+			"v.name as vtuber_name",
+			"v.belongs_to as belongs_to",
+			"v.profile_image_url as profile_image_url",
+			"v.twitter_user_name as twitter_user_name",
+			"v.channel as channel",
+		))
+	default:
+		if props != nil {
+			queries = append(queries, qm.Select(props...))
+		}
+	}
+
+	err := models.Hashtags(queries...).Bind(ctx, hr.DB, &hashtag)
+
+	return hashtag, err
+}
+
 func (hr *hashtagQuery) FindHashtags(
 	ctx context.Context,
 	limit int,
@@ -39,7 +74,7 @@ func (hr *hashtagQuery) FindHashtags(
 	}
 	switch withVtuber {
 	case true:
-		queries = append(queries, qm.LeftOuterJoin("vtubers as v on v.ID = hashtags.vtuber_id"))
+		queries = append(queries, qm.LeftOuterJoin("vtubers as v on v.id = hashtags.vtuber_id"))
 		// TODO: props指定
 		queries = append(queries, qm.Select(
 			"hashtags.*",

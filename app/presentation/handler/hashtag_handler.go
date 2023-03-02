@@ -17,6 +17,22 @@ func NewHashtagHandler(hu usecase.IHashtagUsecase) *hashtagHandler {
 	}
 }
 
+func (hh *hashtagHandler) FindHashtag() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		p := c.Param("id")
+		qms := c.QueryParams()
+
+		hashtag, err := hh.usecase.FindHashtag(ctx, p, qms)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(http.StatusOK, hashtag)
+	}
+}
+
 func (hh *hashtagHandler) FindHashtags() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()

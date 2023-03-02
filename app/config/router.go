@@ -37,6 +37,7 @@ func InitRouter() *echo.Echo {
 	hashtagsGroup := e.Group("/hashtags")
 	{
 		hashtagHandler := handler.NewHashtagHandler(hashtagUsecase)
+		hashtagsGroup.GET("/:id", hashtagHandler.FindHashtag())
 		hashtagsGroup.GET("", hashtagHandler.FindHashtags())
 	}
 
