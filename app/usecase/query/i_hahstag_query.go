@@ -7,6 +7,13 @@ import (
 )
 
 type IHashtagQuery interface {
+	FindHashtag(
+		ctx context.Context,
+		id int,
+		props []string,
+		withVtuber bool,
+	) (dto.Hashtag, error)
+
 	FindHashtags(
 		ctx context.Context,
 		limit int,

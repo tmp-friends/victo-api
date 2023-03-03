@@ -10,6 +10,12 @@ import (
 )
 
 type IHashtagUsecase interface {
+	FindHashtag(
+		ctx context.Context,
+		parameter string,
+		qms url.Values,
+	) (dto.Hashtag, error)
+
 	FindHashtags(ctx context.Context, qms url.Values) ([]dto.Hashtag, error)
 }
 
@@ -23,6 +29,33 @@ func NewHashtagUsecase(hq query.IHashtagQuery) IHashtagUsecase {
 	}
 }
 
+func (hu *hashtagUsecase) FindHashtag(
+	ctx context.Context,
+	parameter string,
+	qms url.Values,
+) (dto.Hashtag, error) {
+	id, err := strconv.Atoi(parameter)
+	if err != nil {
+		return dto.Hashtag{}, err
+	}
+
+	props := qms["props"]
+
+	var withVtuber bool
+	if qms["withVtuber"] != nil {
+		if qms["withVtuber"][0] == "true" {
+			withVtuber = true
+		}
+	}
+
+	h, err := hu.query.FindHashtag(ctx, id, props, withVtuber)
+	if err != nil {
+		return dto.Hashtag{}, err
+	}
+
+	return h, nil
+}
+
 func (hu *hashtagUsecase) FindHashtags(
 	ctx context.Context,
 	qms url.Values,
@@ -32,7 +65,7 @@ func (hu *hashtagUsecase) FindHashtags(
 	if qms["limit"] != nil {
 		l, err := strconv.Atoi(qms["limit"][0])
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		limit = l
 	}
@@ -41,7 +74,7 @@ func (hu *hashtagUsecase) FindHashtags(
 	if qms["offset"] != nil {
 		o, err := strconv.Atoi(qms["offset"][0])
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		offset = o
 	}
@@ -57,7 +90,7 @@ func (hu *hashtagUsecase) FindHashtags(
 
 	hs, err := hu.query.FindHashtags(ctx, limit, offset, props, withVtuber)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return hs, nil

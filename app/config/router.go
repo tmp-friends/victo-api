@@ -10,7 +10,10 @@ import (
 )
 
 const (
-	apiVersion = "/v1"
+	apiVersion   = "/v1"
+	healthzRoot  = "/healthz"
+	hashtagsRoot = apiVersion + "/hashtags"
+	tweetsRoot   = apiVersion + "/tweets"
 )
 
 func InitRouter() *echo.Echo {
@@ -25,7 +28,7 @@ func InitRouter() *echo.Echo {
 	mysqlConnector := NewMySQLConnector()
 
 	// health check
-	healthzGroup := e.Group("/healthz")
+	healthzGroup := e.Group(healthzRoot)
 	{
 		healthzGroup.GET("", handler.Check())
 	}
@@ -34,9 +37,10 @@ func InitRouter() *echo.Echo {
 	hashtagQuery := mysql.NewHashtagQuery(mysqlConnector.Conn)
 	hashtagUsecase := usecase.NewHashtagUsecase(hashtagQuery)
 
-	hashtagsGroup := e.Group("/hashtags")
+	hashtagsGroup := e.Group(hashtagsRoot)
 	{
 		hashtagHandler := handler.NewHashtagHandler(hashtagUsecase)
+		hashtagsGroup.GET("/:id", hashtagHandler.FindHashtag())
 		hashtagsGroup.GET("", hashtagHandler.FindHashtags())
 	}
 
@@ -44,7 +48,7 @@ func InitRouter() *echo.Echo {
 	tweetQuery := mysql.NewTweetQuery(mysqlConnector.Conn)
 	tweetUsecase := usecase.NewTweetUsecase(tweetQuery)
 
-	tweetsGroup := e.Group("/tweets")
+	tweetsGroup := e.Group(tweetsRoot)
 	{
 		tweetHandler := handler.NewTweetHandler(tweetUsecase)
 		tweetsGroup.GET("/:id", tweetHandler.FindTweet())
