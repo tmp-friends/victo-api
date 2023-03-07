@@ -39,7 +39,7 @@ func (lu *loginHandler) CreateSessionCookie() echo.HandlerFunc {
 		cookie.Name = "session"
 		cookie.Value = cookieValue
 		cookie.MaxAge = int(expiresIn.Seconds())
-		cookie.HttpOnly = true
+		cookie.SameSite = http.SameSiteDefaultMode
 		// TODO: Secureもtrueにする
 
 		c.SetCookie(cookie)
