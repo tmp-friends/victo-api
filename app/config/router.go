@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"github.com/tmp-friends/victo-api/app/infra/firebase"
 	"github.com/tmp-friends/victo-api/app/infra/mysql"
 	"github.com/tmp-friends/victo-api/app/presentation/handler"
 	"github.com/tmp-friends/victo-api/app/usecase"
@@ -12,6 +13,7 @@ import (
 const (
 	apiVersion   = "/v1"
 	healthzRoot  = "/healthz"
+	loginRoot    = apiVersion + "/login"
 	hashtagsRoot = apiVersion + "/hashtags"
 	tweetsRoot   = apiVersion + "/tweets"
 )
@@ -25,12 +27,23 @@ func InitRouter() *echo.Echo {
 		middleware.CORS(),
 	)
 
+	// create instances
+	firebaseApp := NewFirebaseApp()
 	mysqlConnector := NewMySQLConnector()
 
 	// health check
 	healthzGroup := e.Group(healthzRoot)
 	{
 		healthzGroup.GET("", handler.Check())
+	}
+
+	// login
+	loginQuery := firebase.NewLoginQuery(firebaseApp)
+	loginUsecase := usecase.NewLoginUsecase(loginQuery)
+	loginGroup := e.Group(loginRoot)
+	{
+		loginHandler := handler.NewLoginHandler(loginUsecase)
+		loginGroup.POST("", loginHandler.CreateSessionCookie())
 	}
 
 	// hashtag
