@@ -13,7 +13,7 @@ import (
 const (
 	apiVersion   = "/v1"
 	healthzRoot  = "/healthz"
-	loginRoot    = apiVersion + "/login"
+	usersRoot    = apiVersion + "/users"
 	hashtagsRoot = apiVersion + "/hashtags"
 	tweetsRoot   = apiVersion + "/tweets"
 )
@@ -40,13 +40,16 @@ func InitRouter() *echo.Echo {
 		healthzGroup.GET("", handler.Check())
 	}
 
-	// login
-	loginQuery := firebase.NewLoginQuery(firebaseApp)
-	loginUsecase := usecase.NewLoginUsecase(loginQuery)
-	loginGroup := e.Group(loginRoot)
+	// user
+	userMysqlQuery := mysql.NewUserQuery(mysqlConnector.Conn)
+	userFirebaseQuery := firebase.NewUserQuery(firebaseApp)
+	userUsecase := usecase.NewUserUsecase(userMysqlQuery, userFirebaseQuery)
+
+	usersGroup := e.Group(usersRoot)
 	{
-		loginHandler := handler.NewLoginHandler(loginUsecase)
-		loginGroup.POST("", loginHandler.CreateSessionCookie())
+		userHandler := handler.NewUserHandler(userUsecase)
+		usersGroup.GET("/me", userHandler.GetMyInfo())
+		usersGroup.POST("/login", userHandler.Login())
 	}
 
 	// hashtag
