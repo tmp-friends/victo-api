@@ -24,7 +24,10 @@ func InitRouter() *echo.Echo {
 	e.Use(
 		middleware.Logger(),
 		middleware.Recover(),
-		middleware.CORS(),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     []string{"http://localhost:3000"},
+			AllowCredentials: true,
+		}),
 	)
 
 	// create instances
