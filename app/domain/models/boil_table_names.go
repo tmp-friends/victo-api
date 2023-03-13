@@ -8,11 +8,13 @@ var TableNames = struct {
 	MediaObjects     string
 	SchemaMigrations string
 	TweetObjects     string
+	Users            string
 	Vtubers          string
 }{
 	Hashtags:         "hashtags",
 	MediaObjects:     "media_objects",
 	SchemaMigrations: "schema_migrations",
 	TweetObjects:     "tweet_objects",
+	Users:            "users",
 	Vtubers:          "vtubers",
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"github.com/tmp-friends/victo-api/app/infra/firebase"
 	"github.com/tmp-friends/victo-api/app/infra/mysql"
 	"github.com/tmp-friends/victo-api/app/presentation/handler"
 	"github.com/tmp-friends/victo-api/app/usecase"
@@ -12,6 +13,7 @@ import (
 const (
 	apiVersion   = "/v1"
 	healthzRoot  = "/healthz"
+	usersRoot    = apiVersion + "/users"
 	hashtagsRoot = apiVersion + "/hashtags"
 	tweetsRoot   = apiVersion + "/tweets"
 )
@@ -22,15 +24,32 @@ func InitRouter() *echo.Echo {
 	e.Use(
 		middleware.Logger(),
 		middleware.Recover(),
-		middleware.CORS(),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     []string{"http://localhost:3000"},
+			AllowCredentials: true,
+		}),
 	)
 
+	// create instances
+	firebaseApp := NewFirebaseApp()
 	mysqlConnector := NewMySQLConnector()
 
 	// health check
 	healthzGroup := e.Group(healthzRoot)
 	{
 		healthzGroup.GET("", handler.Check())
+	}
+
+	// user
+	userMysqlQuery := mysql.NewUserQuery(mysqlConnector.Conn)
+	userFirebaseQuery := firebase.NewUserQuery(firebaseApp)
+	userUsecase := usecase.NewUserUsecase(userMysqlQuery, userFirebaseQuery)
+
+	usersGroup := e.Group(usersRoot)
+	{
+		userHandler := handler.NewUserHandler(userUsecase)
+		usersGroup.GET("/me", userHandler.GetMyInfo())
+		usersGroup.POST("/login", userHandler.Login())
 	}
 
 	// hashtag

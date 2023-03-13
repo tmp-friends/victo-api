@@ -14,10 +14,10 @@ type HTTPInfo struct {
 }
 
 type MySQLInfo struct {
-	User     string
-	Pass string
-	Addr     string
-	DBName   string
+	User   string
+	Pass   string
+	Addr   string
+	DBName string
 }
 
 func LoadConfig() *appConfig {
@@ -35,10 +35,10 @@ func LoadConfig() *appConfig {
 	mysqlDBBame := os.Getenv("MYSQL_DBNAME")
 
 	mysqlInfo := &MySQLInfo{
-		User:     mysqlUser,
-		Pass: mysqlPass,
-		Addr:     mysqlAddr,
-		DBName:   mysqlDBBame,
+		User:   mysqlUser,
+		Pass:   mysqlPass,
+		Addr:   mysqlAddr,
+		DBName: mysqlDBBame,
 	}
 
 	// appConfig
