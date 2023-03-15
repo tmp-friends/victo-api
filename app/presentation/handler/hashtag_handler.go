@@ -47,3 +47,27 @@ func (hh *hashtagHandler) FindHashtags() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, hashtags)
 	}
 }
+
+type FollowHashtagPost struct {
+	Id     int `json:"id"`
+	UserId int `json:"user_id"`
+}
+
+func (hh *hashtagHandler) FollowHashtag() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		p := new(FollowHashtagPost)
+
+		if err := c.Bind(p); err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		err := hh.usecase.FollowHashtag(ctx, p.Id, p.UserId)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(http.StatusOK, "")
+	}
+}

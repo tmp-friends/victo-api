@@ -17,6 +17,12 @@ type IHashtagUsecase interface {
 	) (dto.Hashtag, error)
 
 	FindHashtags(ctx context.Context, qms url.Values) ([]dto.Hashtag, error)
+
+	FollowHashtag(
+		ctx context.Context,
+		hashtagId int,
+		userId int,
+	) error
 }
 
 type hashtagUsecase struct {
@@ -94,4 +100,12 @@ func (hu *hashtagUsecase) FindHashtags(
 	}
 
 	return hs, nil
+}
+
+func (hu *hashtagUsecase) FollowHashtag(
+	ctx context.Context,
+	id int,
+	userId int,
+) error {
+	return hu.query.FollowHashtag(ctx, id, userId)
 }

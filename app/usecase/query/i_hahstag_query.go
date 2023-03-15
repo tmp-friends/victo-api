@@ -21,4 +21,10 @@ type IHashtagQuery interface {
 		props []string,
 		withVtuber bool,
 	) ([]dto.Hashtag, error)
+
+	FollowHashtag(
+		ctx context.Context,
+		id int,
+		userId int,
+	) error
 }
