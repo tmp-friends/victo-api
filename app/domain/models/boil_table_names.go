@@ -4,6 +4,7 @@
 package models
 
 var TableNames = struct {
+	HashtagFollows   string
 	Hashtags         string
 	MediaObjects     string
 	SchemaMigrations string
@@ -11,6 +12,7 @@ var TableNames = struct {
 	Users            string
 	Vtubers          string
 }{
+	HashtagFollows:   "hashtag_follows",
 	Hashtags:         "hashtags",
 	MediaObjects:     "media_objects",
 	SchemaMigrations: "schema_migrations",
