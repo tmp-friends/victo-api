@@ -16,6 +16,7 @@ type IHashtagQuery interface {
 
 	FindHashtags(
 		ctx context.Context,
+		ids []interface{},
 		limit int,
 		offset int,
 		props []string,

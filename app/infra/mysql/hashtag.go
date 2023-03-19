@@ -58,15 +58,17 @@ func (hq *hashtagQuery) FindHashtag(
 
 func (hq *hashtagQuery) FindHashtags(
 	ctx context.Context,
+	ids []interface{},
 	limit int,
 	offset int,
 	props []string,
 	withVtuber bool,
 ) ([]dto.Hashtag, error) {
-	var hashtags []dto.Hashtag
-
 	queries := []qm.QueryMod{}
 
+	if ids != nil {
+		queries = append(queries, qm.WhereIn("hashtags.id in ?", ids...))
+	}
 	if limit != 0 {
 		queries = append(queries, qm.Limit(limit))
 	}
@@ -91,6 +93,7 @@ func (hq *hashtagQuery) FindHashtags(
 		}
 	}
 
+	var hashtags []dto.Hashtag
 	err := models.Hashtags(queries...).Bind(ctx, hq.DB, &hashtags)
 
 	return hashtags, err

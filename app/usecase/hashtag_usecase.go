@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/tmp-friends/victo-api/app/usecase/dto"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
@@ -66,7 +67,22 @@ func (hu *hashtagUsecase) FindHashtags(
 	ctx context.Context,
 	qms url.Values,
 ) ([]dto.Hashtag, error) {
-	// TODO: createParameters()を作るか検討
+	var ids []interface{}
+
+	if qms["ids"] != nil {
+		l := strings.Split(qms["ids"][0], ",")
+
+		// sqlboilerでwherein句を使うためにinterface型にする必要あり
+		ids = make([]interface{}, len(l))
+		for i, v := range l {
+			id, err := strconv.Atoi(v)
+			if err != nil {
+				return nil, err
+			}
+			ids[i] = id
+		}
+	}
+
 	var limit int
 	if qms["limit"] != nil {
 		l, err := strconv.Atoi(qms["limit"][0])
@@ -94,7 +110,7 @@ func (hu *hashtagUsecase) FindHashtags(
 		}
 	}
 
-	hs, err := hu.query.FindHashtags(ctx, limit, offset, props, withVtuber)
+	hs, err := hu.query.FindHashtags(ctx, ids, limit, offset, props, withVtuber)
 	if err != nil {
 		return nil, err
 	}
