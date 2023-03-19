@@ -74,3 +74,18 @@ func (uh *userHandler) generateCookie(cookieValue string, expiresIn int) *http.C
 
 	return cookie
 }
+
+func (uh *userHandler) FindFollowingHashtags() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		p := c.Param("id")
+
+		hashtags, err := uh.usecase.FindFollowingHashtags(ctx, p)
+
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, err.Error())
+		}
+
+		return c.JSON(http.StatusOK, hashtags)
+	}
+}

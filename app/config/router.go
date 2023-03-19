@@ -51,7 +51,7 @@ func InitRouter() *echo.Echo {
 		usersGroup.GET("/me", userHandler.GetMyInfo())
 		usersGroup.POST("/login", userHandler.Login())
 		// TODO: "/logout"エンドポイントを実装する
-		// usersGroup.GET("/:id/following_hashtags", userHandler.FindFollowingHashtags())
+		usersGroup.GET("/:id/following_hashtags", userHandler.FindFollowingHashtags())
 	}
 
 	// hashtag

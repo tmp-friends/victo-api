@@ -18,6 +18,11 @@ type IUserMysqlQuery interface {
 		ctx context.Context,
 		googleAccountInfo dto.GoogleAccountInfo,
 	) error
+
+	FindFollowingHashtags(
+		ctx context.Context,
+		uid int,
+	) (models.HashtagFollowSlice, error)
 }
 
 type IUserFirebaseQuery interface {

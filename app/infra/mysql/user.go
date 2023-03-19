@@ -54,3 +54,15 @@ func (uq *userQuery) hash(uid string) string {
 
 	return hex.EncodeToString(bytes[:])
 }
+
+func (uq *userQuery) FindFollowingHashtags(
+	ctx context.Context,
+	uid int,
+) (models.HashtagFollowSlice, error) {
+	// TODO: Props指定
+	hfs, err := models.HashtagFollows(
+		models.HashtagFollowWhere.UserID.EQ(uid),
+	).All(ctx, uq.DB)
+
+	return hfs, err
+}
