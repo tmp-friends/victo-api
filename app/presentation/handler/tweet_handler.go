@@ -33,13 +33,12 @@ func (th *tweetHandler) FindTweet() echo.HandlerFunc {
 	}
 }
 
-func (th *tweetHandler) FindTweetsByHashtagId() echo.HandlerFunc {
+func (th *tweetHandler) FindTweets() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
-		p := c.Param("id")
 		qms := c.QueryParams()
 
-		tweets, err := th.usecase.FindTweetsByHashtagId(ctx, p, qms)
+		tweets, err := th.usecase.FindTweets(ctx, qms)
 
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, err.Error())

@@ -13,9 +13,9 @@ type ITweetQuery interface {
 		props []string,
 	) (*models.TweetObject, error)
 
-	FindTweetsByHashtagId(
+	FindTweets(
 		ctx context.Context,
-		hashtagId string,
+		hashtagIds []interface{},
 		limit int,
 		offset int,
 		props []string,
