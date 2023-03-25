@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"net/http"
+	"strconv"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
@@ -18,6 +19,11 @@ type IUserUsecase interface {
 		ctx context.Context,
 		parameter string,
 	) (string, int, error)
+
+	FindFollowingHashtags(
+		ctx context.Context,
+		parameter string,
+	) (models.HashtagFollowSlice, error)
 }
 
 type userUsecase struct {
@@ -58,4 +64,15 @@ func (uu *userUsecase) Login(
 	cookie, expiresIn, err := uu.firebaseQuery.CreateSessionCookie(ctx, parameter)
 
 	return cookie, expiresIn, err
+}
+
+func (uu *userUsecase) FindFollowingHashtags(
+	ctx context.Context,
+	parameter string,
+) (models.HashtagFollowSlice, error) {
+	uid, err := strconv.Atoi(parameter)
+	if err != nil {
+		return models.HashtagFollowSlice{}, err
+	}
+	return uu.mysqlQuery.FindFollowingHashtags(ctx, uid)
 }

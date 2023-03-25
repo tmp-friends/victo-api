@@ -50,6 +50,8 @@ func InitRouter() *echo.Echo {
 		userHandler := handler.NewUserHandler(userUsecase)
 		usersGroup.GET("/me", userHandler.GetMyInfo())
 		usersGroup.POST("/login", userHandler.Login())
+		// TODO: "/logout"エンドポイントを実装する
+		usersGroup.GET("/:id/following_hashtags", userHandler.FindFollowingHashtags())
 	}
 
 	// hashtag
@@ -61,6 +63,8 @@ func InitRouter() *echo.Echo {
 		hashtagHandler := handler.NewHashtagHandler(hashtagUsecase)
 		hashtagsGroup.GET("/:id", hashtagHandler.FindHashtag())
 		hashtagsGroup.GET("", hashtagHandler.FindHashtags())
+		hashtagsGroup.POST("/follow", hashtagHandler.FollowHashtag())
+		hashtagsGroup.POST("/unfollow", hashtagHandler.UnfollowHashtag())
 	}
 
 	// tweet
@@ -71,7 +75,7 @@ func InitRouter() *echo.Echo {
 	{
 		tweetHandler := handler.NewTweetHandler(tweetUsecase)
 		tweetsGroup.GET("/:id", tweetHandler.FindTweet())
-		tweetsGroup.GET("/hashtag/:id", tweetHandler.FindTweetsByHashtagId())
+		tweetsGroup.GET("", tweetHandler.FindTweets())
 	}
 
 	return e

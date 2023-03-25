@@ -35,16 +35,18 @@ func (tr *tweetQuery) FindTweet(
 	return models.TweetObjects(queries...).One(ctx, tr.DB)
 }
 
-func (tr *tweetQuery) FindTweetsByHashtagId(
+func (tr *tweetQuery) FindTweets(
 	ctx context.Context,
-	hashtagId string,
+	hashtagIds []interface{},
 	limit int,
 	offset int,
 	props []string,
 ) (models.TweetObjectSlice, error) {
 	queries := []qm.QueryMod{}
 
-	queries = append(queries, qm.Where("hashtag_id=?", hashtagId))
+	if hashtagIds != nil {
+		queries = append(queries, qm.WhereIn("hashtag_id in ?", hashtagIds...))
+	}
 
 	if limit != 0 {
 		queries = append(queries, qm.Limit(limit))

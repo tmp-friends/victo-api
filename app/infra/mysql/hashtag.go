@@ -7,6 +7,7 @@ import (
 	"github.com/tmp-friends/victo-api/app/domain/models"
 	"github.com/tmp-friends/victo-api/app/usecase/dto"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
@@ -20,7 +21,7 @@ func NewHashtagQuery(db *sql.DB) query.IHashtagQuery {
 	}
 }
 
-func (hr *hashtagQuery) FindHashtag(
+func (hq *hashtagQuery) FindHashtag(
 	ctx context.Context,
 	id int,
 	props []string,
@@ -50,22 +51,24 @@ func (hr *hashtagQuery) FindHashtag(
 		}
 	}
 
-	err := models.Hashtags(queries...).Bind(ctx, hr.DB, &hashtag)
+	err := models.Hashtags(queries...).Bind(ctx, hq.DB, &hashtag)
 
 	return hashtag, err
 }
 
-func (hr *hashtagQuery) FindHashtags(
+func (hq *hashtagQuery) FindHashtags(
 	ctx context.Context,
+	ids []interface{},
 	limit int,
 	offset int,
 	props []string,
 	withVtuber bool,
 ) ([]dto.Hashtag, error) {
-	var hashtags []dto.Hashtag
-
 	queries := []qm.QueryMod{}
 
+	if ids != nil {
+		queries = append(queries, qm.WhereIn("hashtags.id in ?", ids...))
+	}
 	if limit != 0 {
 		queries = append(queries, qm.Limit(limit))
 	}
@@ -90,7 +93,33 @@ func (hr *hashtagQuery) FindHashtags(
 		}
 	}
 
-	err := models.Hashtags(queries...).Bind(ctx, hr.DB, &hashtags)
+	var hashtags []dto.Hashtag
+	err := models.Hashtags(queries...).Bind(ctx, hq.DB, &hashtags)
 
 	return hashtags, err
+}
+
+func (hq *hashtagQuery) FollowHashtag(
+	ctx context.Context,
+	id int,
+	userId int,
+) error {
+	f := models.HashtagFollow{
+		UserID:    userId,
+		HashtagID: id,
+	}
+	err := f.Insert(ctx, hq.DB, boil.Infer())
+
+	return err
+}
+
+func (hq *hashtagQuery) UnfollowHashtag(
+	ctx context.Context,
+	id int,
+	userId int,
+) error {
+	f, _ := models.FindHashtagFollow(ctx, hq.DB, userId, id)
+	_, err := f.Delete(ctx, hq.DB)
+
+	return err
 }

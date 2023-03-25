@@ -16,9 +16,22 @@ type IHashtagQuery interface {
 
 	FindHashtags(
 		ctx context.Context,
+		ids []interface{},
 		limit int,
 		offset int,
 		props []string,
 		withVtuber bool,
 	) ([]dto.Hashtag, error)
+
+	FollowHashtag(
+		ctx context.Context,
+		id int,
+		userId int,
+	) error
+
+	UnfollowHashtag(
+		ctx context.Context,
+		id int,
+		userId int,
+	) error
 }
