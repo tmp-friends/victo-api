@@ -64,6 +64,7 @@ func InitRouter() *echo.Echo {
 		hashtagsGroup.GET("/:id", hashtagHandler.FindHashtag())
 		hashtagsGroup.GET("", hashtagHandler.FindHashtags())
 		hashtagsGroup.POST("/follow", hashtagHandler.FollowHashtag())
+		hashtagsGroup.POST("/unfollow", hashtagHandler.UnfollowHashtag())
 	}
 
 	// tweet

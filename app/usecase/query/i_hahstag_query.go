@@ -28,4 +28,10 @@ type IHashtagQuery interface {
 		id int,
 		userId int,
 	) error
+
+	UnfollowHashtag(
+		ctx context.Context,
+		id int,
+		userId int,
+	) error
 }

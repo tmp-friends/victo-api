@@ -19,11 +19,9 @@ type IHashtagUsecase interface {
 
 	FindHashtags(ctx context.Context, qms url.Values) ([]dto.Hashtag, error)
 
-	FollowHashtag(
-		ctx context.Context,
-		hashtagId int,
-		userId int,
-	) error
+	FollowHashtag(ctx context.Context, hashtagId int, userId int) error
+
+	UnfollowHashtag(ctx context.Context, hashtagId int, userId int) error
 }
 
 type hashtagUsecase struct {
@@ -124,4 +122,12 @@ func (hu *hashtagUsecase) FollowHashtag(
 	userId int,
 ) error {
 	return hu.query.FollowHashtag(ctx, id, userId)
+}
+
+func (hu *hashtagUsecase) UnfollowHashtag(
+	ctx context.Context,
+	id int,
+	userId int,
+) error {
+	return hu.query.UnfollowHashtag(ctx, id, userId)
 }

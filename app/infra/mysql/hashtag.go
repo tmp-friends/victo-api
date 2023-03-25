@@ -112,3 +112,14 @@ func (hq *hashtagQuery) FollowHashtag(
 
 	return err
 }
+
+func (hq *hashtagQuery) UnfollowHashtag(
+	ctx context.Context,
+	id int,
+	userId int,
+) error {
+	f, _ := models.FindHashtagFollow(ctx, hq.DB, userId, id)
+	_, err := f.Delete(ctx, hq.DB)
+
+	return err
+}

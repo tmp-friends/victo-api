@@ -71,3 +71,22 @@ func (hh *hashtagHandler) FollowHashtag() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, "")
 	}
 }
+
+func (hh *hashtagHandler) UnfollowHashtag() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		p := new(FollowHashtagPost)
+
+		if err := c.Bind(p); err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		err := hh.usecase.UnfollowHashtag(ctx, p.Id, p.UserId)
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(http.StatusOK, "")
+	}
+}
