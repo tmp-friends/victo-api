@@ -3,9 +3,11 @@ package usecase
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
+	"github.com/tmp-friends/victo-api/app/usecase/dto"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
 )
 
@@ -23,7 +25,8 @@ type IUserUsecase interface {
 	FindFollowingHashtags(
 		ctx context.Context,
 		parameter string,
-	) (models.HashtagFollowSlice, error)
+		qms url.Values,
+	) ([]dto.Hashtag, error)
 }
 
 type userUsecase struct {
@@ -69,10 +72,21 @@ func (uu *userUsecase) Login(
 func (uu *userUsecase) FindFollowingHashtags(
 	ctx context.Context,
 	parameter string,
-) (models.HashtagFollowSlice, error) {
+	qms url.Values,
+) ([]dto.Hashtag, error) {
 	uid, err := strconv.Atoi(parameter)
 	if err != nil {
-		return models.HashtagFollowSlice{}, err
+		return []dto.Hashtag{}, err
 	}
-	return uu.mysqlQuery.FindFollowingHashtags(ctx, uid)
+
+	props := qms["props"]
+
+	var withVtuber bool
+	if qms["withVtuber"] != nil {
+		if qms["withVtuber"][0] == "true" {
+			withVtuber = true
+		}
+	}
+
+	return uu.mysqlQuery.FindFollowingHashtags(ctx, uid, props, withVtuber)
 }

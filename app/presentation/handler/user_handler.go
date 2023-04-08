@@ -79,8 +79,9 @@ func (uh *userHandler) FindFollowingHashtags() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
 		p := c.Param("id")
+		qms := c.QueryParams()
 
-		hashtags, err := uh.usecase.FindFollowingHashtags(ctx, p)
+		hashtags, err := uh.usecase.FindFollowingHashtags(ctx, p, qms)
 
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, err.Error())

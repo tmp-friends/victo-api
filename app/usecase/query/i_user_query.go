@@ -22,7 +22,9 @@ type IUserMysqlQuery interface {
 	FindFollowingHashtags(
 		ctx context.Context,
 		uid int,
-	) (models.HashtagFollowSlice, error)
+		props []string,
+		withVtuber bool,
+	) ([]dto.Hashtag, error)
 }
 
 type IUserFirebaseQuery interface {
