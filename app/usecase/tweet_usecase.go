@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
+	"github.com/tmp-friends/victo-api/app/usecase/dto"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
 )
 
@@ -20,7 +21,7 @@ type ITweetUsecase interface {
 	FindTweets(
 		ctx context.Context,
 		qms url.Values,
-	) (models.TweetObjectSlice, error)
+	) ([]dto.Tweet, error)
 }
 
 type tweetUsecase struct {
@@ -56,7 +57,7 @@ func (tu *tweetUsecase) FindTweet(
 func (tu *tweetUsecase) FindTweets(
 	ctx context.Context,
 	qms url.Values,
-) (models.TweetObjectSlice, error) {
+) ([]dto.Tweet, error) {
 	var hashtagIds []interface{}
 
 	if qms["hashtag_ids"] != nil {
@@ -93,12 +94,20 @@ func (tu *tweetUsecase) FindTweets(
 
 	props := qms["props"]
 
+	var withMedia bool
+	if qms["withMedia"] != nil {
+		if qms["withMedia"][0] == "true" {
+			withMedia = true
+		}
+	}
+
 	tos, err := tu.query.FindTweets(
 		ctx,
 		hashtagIds,
 		limit,
 		offset,
 		props,
+		withMedia,
 	)
 	if err != nil {
 		return nil, err

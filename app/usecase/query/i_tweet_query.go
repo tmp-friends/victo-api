@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/tmp-friends/victo-api/app/domain/models"
+	"github.com/tmp-friends/victo-api/app/usecase/dto"
 )
 
 type ITweetQuery interface {
@@ -19,5 +20,6 @@ type ITweetQuery interface {
 		limit int,
 		offset int,
 		props []string,
-	) (models.TweetObjectSlice, error)
+		withMedia bool,
+	) ([]dto.Tweet, error)
 }

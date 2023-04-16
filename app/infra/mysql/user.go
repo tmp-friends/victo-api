@@ -10,6 +10,7 @@ import (
 	"github.com/tmp-friends/victo-api/app/usecase/dto"
 	"github.com/tmp-friends/victo-api/app/usecase/query"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type userQuery struct {
@@ -58,11 +59,44 @@ func (uq *userQuery) hash(uid string) string {
 func (uq *userQuery) FindFollowingHashtags(
 	ctx context.Context,
 	uid int,
-) (models.HashtagFollowSlice, error) {
-	// TODO: Props指定
+	props []string,
+	withVtuber bool,
+) ([]dto.Hashtag, error) {
+	// FollowしているHashtagを取得
 	hfs, err := models.HashtagFollows(
 		models.HashtagFollowWhere.UserID.EQ(uid),
 	).All(ctx, uq.DB)
 
-	return hfs, err
+	// Hashtag情報を取得
+	var hashtagIds []interface{}
+	for _, v := range hfs {
+		hashtagIds = append(hashtagIds, v.HashtagID)
+	}
+
+	queries := []qm.QueryMod{}
+
+	queries = append(queries, qm.WhereIn("hashtags.id in ?", hashtagIds...))
+
+	switch withVtuber {
+	case true:
+		queries = append(queries, qm.LeftOuterJoin("vtubers as v on v.id = hashtags.vtuber_id"))
+		// TODO: props指定
+		queries = append(queries, qm.Select(
+			"hashtags.*",
+			"v.name as vtuber_name",
+			"v.belongs_to as belongs_to",
+			"v.profile_image_url as profile_image_url",
+			"v.twitter_user_name as twitter_user_name",
+			"v.channel as channel",
+		))
+	default:
+		if props != nil {
+			queries = append(queries, qm.Select(props...))
+		}
+	}
+
+	var hashtags []dto.Hashtag
+	err = models.Hashtags(queries...).Bind(ctx, uq.DB, &hashtags)
+
+	return hashtags, err
 }
